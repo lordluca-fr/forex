@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>Label</key>
+	<string>com.forex.gitpull</string>
+	<key>ProgramArguments</key>
+	<array>
+		<string>/bin/bash</string>
+		<string>/Users/djaka_mm/projects/forex/scripts/git_pull_mm.sh</string>
+	</array>
+	<key>EnvironmentVariables</key>
+	<dict>
+		<key>FOREX_GIT_PULL_LOG</key>
+		<string>/Users/djaka_mm/projects/forex/logs/git_pull.log</string>
+	</dict>
+	<key>StartInterval</key>
+	<integer>300</integer>
+	<key>RunAtLoad</key>
+	<true/>
+	<key>StandardOutPath</key>
+	<string>/Users/djaka_mm/projects/forex/logs/git_pull.log</string>
+	<key>StandardErrorPath</key>
+	<string>/Users/djaka_mm/projects/forex/logs/git_pull.log</string>
+</dict>
+</plist>
