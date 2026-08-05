@@ -62,6 +62,32 @@ carried over from TigerTrading.
 EUR/USD data and, ideally, a StockSharp eval — both need to happen on the Mac
 Mini (has real internet + can install .NET), not this sandbox.
 
+## Mac Mini environment setup (2026-08-05)
+
+Both prerequisites for a real test are now in place:
+
+- **Real EUR/USD data**: `backtest/fetch_data.py` fetches daily OHLC to
+  `backtest/data/eurusd_daily.csv` (gitignored, regenerable). 3016 rows,
+  2015-01-01 to 2026-08-04, sourced from yfinance — **Stooq (the intended
+  primary source) turned out to be unusable**: `stooq.com/q/d/l/` now serves
+  a JS proof-of-work bot-check page with an HTTP 200 (so a status-code-only
+  reachability check, which is what the original DECISIONS.md research and
+  this repo's initial curl test both did, is silently fooled — the script's
+  `raise_for_status()` doesn't catch it, only the missing `Date` column
+  does). yfinance is the working path until/unless a browser-capable
+  scraper or an official Stooq API key is worth the effort.
+- **dotnet SDK 10.0.302** installed via `brew install dotnet` (formula, not
+  the `dotnet-sdk` cask) — `/opt/homebrew/bin/dotnet`, already on PATH, no
+  `DOTNET_ROOT` export needed for CLI use despite the brew caveat (that
+  caveat is for *other* software locating the runtime, not for running
+  `dotnet` itself).
+- **Landmine**: the Mac Mini's system `python3` (Homebrew, 3.14.5) SIGBUSes
+  (exit 138) on `yfinance.download()` — pandas/numpy's compiled wheels
+  aren't stable on 3.14 on this Apple Silicon build yet. Fixed by creating
+  `~/forex-env` (python3.12 venv, matches TigerTrading's `tigertrading-env`
+  pattern) — **use `~/forex-env/bin/python`, not system `python3`, for
+  anything touching pandas/numpy/yfinance on the Mac Mini.**
+
 ## Broker for live/paper execution (Singapore, MAS-regulated)
 Two realistic options, not yet chosen:
 - **OANDA Singapore** — MAS-regulated, REST v20 API (what FXBot/tpqoa use),

@@ -8,6 +8,10 @@ backtest/data/eurusd_daily.csv, which is gitignored (regenerable, not
 committed) -- re-run anytime to refresh.
 
 Usage: python3 backtest/fetch_data.py [--start 2015-01-01] [--end 2026-08-05]
+
+On the Mac Mini, use ~/forex-env/bin/python (a python3.12 venv), not system
+python3 -- Homebrew's python3.14 there SIGBUSes inside yfinance.download(),
+a pandas/numpy wheel-compatibility issue, not a bug in this script.
 """
 import argparse
 import datetime as dt
