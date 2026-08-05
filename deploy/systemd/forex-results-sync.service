@@ -1,0 +1,7 @@
+[Unit]
+Description=Sync Forex Mac Mini backtest results to NAS backup
+
+[Service]
+Type=oneshot
+User=Djakaa
+ExecStart=/bin/sh -c 'exec /volume1/Forex/scripts/sync_results_to_nas.sh >> /volume1/Forex/logs/results_sync.log 2>&1'

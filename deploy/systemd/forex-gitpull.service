@@ -1,0 +1,7 @@
+[Unit]
+Description=Forex NAS fast-forward-only git pull
+
+[Service]
+Type=oneshot
+User=Djakaa
+ExecStart=/bin/sh -c 'exec /volume1/Forex/scripts/git_pull_nas.sh >> /volume1/Forex/logs/git_pull.log 2>&1'

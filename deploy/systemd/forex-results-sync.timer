@@ -1,0 +1,10 @@
+[Unit]
+Description=Run Forex backtest-results NAS backup every 5 minutes
+
+[Timer]
+OnBootSec=2min
+OnUnitActiveSec=5min
+Unit=forex-results-sync.service
+
+[Install]
+WantedBy=timers.target

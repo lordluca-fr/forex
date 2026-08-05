@@ -1,0 +1,10 @@
+[Unit]
+Description=Run Forex NAS git pull every 5 minutes
+
+[Timer]
+OnBootSec=1min
+OnUnitActiveSec=5min
+Unit=forex-gitpull.service
+
+[Install]
+WantedBy=timers.target

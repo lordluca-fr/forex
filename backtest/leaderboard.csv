@@ -1,0 +1,1 @@
+run_id,date,strategy,engine,params_hash,data_source,date_range,cagr,sharpe,max_dd,trades,git_commit,verdict
