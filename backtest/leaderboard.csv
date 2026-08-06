@@ -1,1 +1,3 @@
 run_id,date,strategy,engine,params_hash,data_source,date_range,cagr,sharpe,max_dd,trades,git_commit,verdict
+sma_crossover__fxbot__90db40f2__20260806-093445,2026-08-06,sma_crossover,fxbot,90db40f2,yfinance,2015-01-01:2026-08-04,0.531,0.0687,-19.5069,136,a749159,
+sma_crossover__lumibot__fd3a3287__20260806-093633,2026-08-06,sma_crossover,lumibot,fd3a3287,yfinance,2015-01-01:2026-08-04,1.8978,-0.1,-39.2998,,a0f0626,
