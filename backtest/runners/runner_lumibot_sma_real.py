@@ -134,12 +134,30 @@ def main():
         "git_commit": git_commit(), "run_at": datetime.datetime.now().isoformat(),
     }, indent=2, default=str))
 
-    metrics = {}
-    if result:
-        for k in ("cagr", "total_return", "sharpe", "max_drawdown", "volatility"):
-            if k in result:
-                v = result[k]
-                metrics[k] = float(v) if isinstance(v, (int, float, np.floating)) else str(v)
+    # lumibot's result dict mixes raw fractions (cagr, total_return, volatility)
+    # with a dict for max_drawdown ({'drawdown': <positive fraction>, 'date': ...})
+    # -- normalize everything here to percentage floats matching FXBot's
+    # metrics.json convention (cagr_pct, max_dd_pct as a *negative* number),
+    # so the leaderboard is comparing like units, not raw dict reprs.
+    raw_max_dd = result.get("max_drawdown") if result else None
+    max_dd_pct = None
+    if isinstance(raw_max_dd, dict) and "drawdown" in raw_max_dd:
+        max_dd_pct = -float(raw_max_dd["drawdown"]) * 100
+    elif isinstance(raw_max_dd, (int, float, np.floating)):
+        max_dd_pct = -abs(float(raw_max_dd)) * 100
+
+    def pct(key):
+        v = result.get(key) if result else None
+        return round(float(v) * 100, 4) if isinstance(v, (int, float, np.floating)) else None
+
+    metrics = {
+        "cagr_pct": pct("cagr"),
+        "total_return_pct": pct("total_return"),
+        "sharpe": round(float(result["sharpe"]), 4) if result and isinstance(result.get("sharpe"), (int, float, np.floating)) else None,
+        "max_dd_pct": round(max_dd_pct, 4) if max_dd_pct is not None else None,
+        "volatility_pct": pct("volatility"),
+        "max_drawdown_date": raw_max_dd.get("date").isoformat() if isinstance(raw_max_dd, dict) and hasattr(raw_max_dd.get("date"), "isoformat") else None,
+    }
     (run_dir / "metrics.json").write_text(json.dumps(metrics, indent=2))
 
     LEADERBOARD.parent.mkdir(parents=True, exist_ok=True)
@@ -148,8 +166,8 @@ def main():
         if header_needed:
             f.write("run_id,date,strategy,engine,params_hash,data_source,date_range,cagr,sharpe,max_dd,trades,git_commit,verdict\n")
         f.write(f"{run_id},{datetime.datetime.now().date()},{STRATEGY},{ENGINE},{params_hash},yfinance,"
-                f"{start.date()}:{end.date()},{metrics.get('cagr','')},{metrics.get('sharpe','')},"
-                f"{metrics.get('max_drawdown','')},,{git_commit()},\n")
+                f"{start.date()}:{end.date()},{metrics.get('cagr_pct','')},{metrics.get('sharpe','')},"
+                f"{metrics.get('max_dd_pct','')},,{git_commit()},\n")
 
     print(f"\n--- lumibot SMA({SMAS},{SMAL}) on real EUR/USD ({start.date()} to {end.date()}) ---")
     print(json.dumps(metrics, indent=2))
