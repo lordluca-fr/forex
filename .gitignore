@@ -4,4 +4,5 @@ __pycache__/
 *.pyc
 backtest/data/
 backtest/results/
+backtest/vendor/
 .sync_state/

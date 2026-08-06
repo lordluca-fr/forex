@@ -12,6 +12,7 @@ backtest/
   runners/      One entrypoint script per experiment (e.g. runner_sma_crossover.py). Tracked.
   data/         Cached historical OHLCV (CSV/parquet/pickle). Gitignored — large, regenerable from the broker/source.
   results/      Raw per-run output, one folder per run (see below). Gitignored — backed up to the NAS instead, not to git.
+  vendor/       Third-party platform checkouts we test against (e.g. FXBot). Gitignored — cloned fresh per host, not vendored into our history.
   leaderboard.csv   One row per run. Tracked — this is the small, durable record git keeps even though results/ isn't.
 ```
 
