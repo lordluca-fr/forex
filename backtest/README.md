@@ -31,7 +31,14 @@ Every run appends one row (strategy, params-hash, date range, key metrics,
 folder name, git commit, verdict). This is what makes `git log` on this repo
 show the shape of the search over time even though the heavy per-run
 artifacts live only on the Mac Mini (primary) and NAS (backup via
-`scripts/sync_results_to_nas.sh`, 5-min rsync mirror), not in git.
+`scripts/sync_results_to_nas.sh`, 5-min rsync mirror of `results/` only —
+`leaderboard.csv` is git-tracked, so it reaches the NAS via the normal git
+pull, not rsync; the two mechanisms fighting over the same file was tried
+and broke NAS pulls, see the script's comments), not in git.
+
+Whichever host actually ran the backtest (usually the Mac Mini) commits and
+pushes the updated `leaderboard.csv` directly — there's no separate
+"laptop reviews and commits" step for this one file.
 
 **Settled verdicts** (not just raw numbers) go to the Second Brain vault:
 `SecondBrain/Projects/Forex/Experiments.md` — append there when a run

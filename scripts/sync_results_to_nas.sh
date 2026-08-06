@@ -78,13 +78,15 @@ if ! rsync -az --delete -e "ssh $SSH_OPTS" \
     exit 1
 fi
 
-LOG "Syncing leaderboard.csv from Mac Mini..."
-if ! rsync -az -e "ssh $SSH_OPTS" \
-    "${FOREX_MM_HOST}:${FOREX_MM_REPO_DIR}/backtest/leaderboard.csv" "$FOREX_NAS_ROOT/backtest/leaderboard.csv" >>"$LOG_FILE" 2>&1; then
-    LOG "ERROR: leaderboard.csv rsync failed"
-    ALERT_ONCE "leaderboard.csv rsync from Mac Mini failed — check logs/results_sync.log"
-    exit 1
-fi
+# leaderboard.csv is deliberately NOT rsynced here even though it lives
+# under backtest/ -- it's git-tracked (see backtest/README.md), and rsync
+# writing to a git-tracked path leaves the working tree dirty relative to
+# git's index without git ever knowing. That dirtiness then permanently
+# blocks forex-gitpull.timer's `merge --ff-only` the next time Mac Mini
+# pushes a leaderboard update (hit in practice 2026-08-06: NAS pull failed
+# repeatedly with "local changes would be overwritten by merge" until this
+# rsync was removed). leaderboard.csv reaches the NAS via the normal git
+# pull path instead, same as every other tracked file.
 
 if [ -f "$RSYNC_ALERTED_FILE" ]; then
     rm -f "$RSYNC_ALERTED_FILE"
