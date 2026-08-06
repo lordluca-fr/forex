@@ -88,6 +88,35 @@ Both prerequisites for a real test are now in place:
   pattern) — **use `~/forex-env/bin/python`, not system `python3`, for
   anything touching pandas/numpy/yfinance on the Mac Mini.**
 
+## Real-data run + FXBot/lumibot reconciliation (2026-08-06)
+
+`backtest/runners/runner_fxbot_sma_real.py` / `runner_lumibot_sma_real.py`,
+real EUR/USD 2015-01-01 to 2026-08-04, same SMA(20,50):
+
+| | FXBot | lumibot |
+|---|---|---|
+| CAGR | 0.53% | 1.90% |
+| Sharpe | 0.07 | -0.10 |
+| Max DD | -19.5% | -39.3% |
+
+**SMA(20,50) alone is not viable** — near-zero/negative Sharpe on both.
+
+The two engines' numbers disagree, but **reconciliation confirmed this is
+not a bug**: pulled FXBot's day-by-day position series and lumibot's real
+order fills (via its native `trades_file=` param) and compared flip dates
+directly — all 68 flips land on the exact same date and direction on both
+engines, 11.5 years, zero mismatches. The gap is entirely in P&L
+accounting: FXBot compounds an idealized continuous log-return position
+(fast, no realistic constraints); lumibot executes real sell-then-buy
+orders off actual cash balance each flip (slow, closer to what a live
+broker would actually do). Full writeup:
+`SecondBrain/Projects/Forex/Experiments.md` (2026-08-06 entry).
+
+**Working conclusion**: use FXBot for fast/wide parameter sweeps (relative
+ranking), validate promising candidates in lumibot before considering
+live/paper deployment. Don't trust FXBot's absolute Sharpe/CAGR as a
+live-trading estimate.
+
 ## Broker for live/paper execution (Singapore, MAS-regulated)
 Two realistic options, not yet chosen:
 - **OANDA Singapore** — MAS-regulated, REST v20 API (what FXBot/tpqoa use),

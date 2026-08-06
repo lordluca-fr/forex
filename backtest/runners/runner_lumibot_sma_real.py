@@ -105,6 +105,10 @@ def main():
     quote = Asset(symbol="USD", asset_type="forex")
     data = Data(base, ohlcv, date_start=start, date_end=end, timestep="day", quote=quote)
 
+    run_id = f"{STRATEGY}__{ENGINE}__{params_hash}__{datetime.datetime.now().strftime('%Y%m%d-%H%M%S')}"
+    run_dir = RESULTS_ROOT / run_id
+    run_dir.mkdir(parents=True, exist_ok=True)
+
     result = SmaCross.backtest(
         datasource_class=PandasDataBacktesting,
         backtesting_start=start,
@@ -121,11 +125,12 @@ def main():
         show_progress_bar=False,
         quiet_logs=True,
         name="SmaCross-EURUSD-real",
+        # Real per-order fill log (date/side/price/qty), not just aggregate
+        # metrics -- this is what let 2026-08-06's engine-disagreement
+        # reconciliation compare exact flip dates against FXBot's position
+        # series instead of guessing from aggregate numbers alone.
+        trades_file=str(run_dir / "trades.csv"),
     )
-
-    run_id = f"{STRATEGY}__{ENGINE}__{params_hash}__{datetime.datetime.now().strftime('%Y%m%d-%H%M%S')}"
-    run_dir = RESULTS_ROOT / run_id
-    run_dir.mkdir(parents=True, exist_ok=True)
 
     (run_dir / "run_manifest.json").write_text(json.dumps({
         "strategy": STRATEGY, "engine": ENGINE, "engine_type": "event_driven",
