@@ -124,3 +124,31 @@ Two realistic options, not yet chosen:
 - **Interactive Brokers Singapore** — MAS-regulated, already have an account
   (used for TigerTrading US stocks) — check whether FX trading permissions can
   just be enabled on the existing account before opening anything new with OANDA.
+
+### IBKR forex access confirmed (2026-08-06, via IBKR MCP connection, read-only)
+
+EUR/USD spot forex is fully queryable on the connected IBKR account —
+strengthens the case for using IBKR over opening a new OANDA account:
+- `search_contracts("EUR.USD")` resolves the real IDEALPRO spot pair
+  (`contract_id 12087792`, security_type CASH, exchange IDEALPRO) — note
+  `"EURUSD"` (no dot) as a query is noisier (matches CFD/FOP/FUT/Kalshi
+  prediction-market rows too) — use the dotted form.
+- `get_price_snapshot`: live/delayed quote returned successfully, tight
+  ~0.5 pip spread, institutional-size bid/ask (4M/23.5M) — looks like real
+  market data, not a placeholder.
+- `get_price_history`: 1,297 daily bars, 2021-08-08 to present (5-year cap
+  on this call), OHLC internally consistent and correctly reflects real
+  EUR/USD action including the sub-parity dip to ~0.953 in Sep/Oct 2022.
+  Shorter history than yfinance's 2015-onward series, but same source as
+  execution would be — no backtest-vs-live data mismatch if IBKR became
+  both the data source and the broker.
+
+**Not yet resolved**: `get_account_summary`/`get_account_balances` on the
+connected account show $0 everywhere (SGD, no account ID surfaced) — can't
+tell paper vs. live from that alone, and a $0 paper account can't actually
+test order submission (insufficient buying power) until it's funded/reset
+with simulated cash. **Owner confirmed 2026-08-06: no real money in this
+IBKR account — paper trading only, ever, for this project.** No orders
+placed — no validated strategy exists yet (SMA(20,50) already ruled out
+above) and order placement without one would just be testing plumbing, not
+research.
